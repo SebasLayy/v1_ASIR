@@ -1,0 +1,230 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #2c0b0b;
+    color: #f5e6e6;
+    line-height: 1.5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #3e1a1a;
+    border-radius: 28px;
+    box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+    overflow: hidden;
+    padding: 0 25px 35px 25px;
+}
+
+.header h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #a12323, #631212);
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 50px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 12px #3a0a0a;
+    color: #ffcfcf;
+}
+
+.subtitle {
+    margin-bottom: 20px;
+    color: #f0bcbc;
+}
+
+.search-section {
+    background: #2f1313;
+    padding: 15px 20px;
+    border-radius: 40px;
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-section label {
+    font-weight: bold;
+    background: #a03a3a;
+    padding: 5px 12px;
+    border-radius: 30px;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 50px;
+    border: none;
+    background: #531e1e;
+    color: #ffe0e0;
+    font-size: 1rem;
+    outline: none;
+}
+
+#searchInput::placeholder {
+    color: #cc9a9a;
+}
+
+.clear-btn {
+    background: #732c2c;
+    padding: 8px 18px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.clear-btn:hover {
+    background: #b14545;
+}
+
+.card {
+    background: #2f1515e0;
+    backdrop-filter: blur(2px);
+    border-radius: 28px;
+    padding: 20px 25px;
+    margin: 25px 0;
+    box-shadow: 0 6px 14px #1f0909;
+    border: 1px solid #af5e5e;
+    transition: 0.1s ease;
+}
+
+.card.hidden {
+    display: none;
+}
+
+h2, h3 {
+    font-weight: 600;
+    border-left: 6px solid #e05a5a;
+    padding-left: 18px;
+    margin: 20px 0 15px 0;
+    color: #ffcfcf;
+}
+
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.4rem; margin-top: 25px; }
+
+pre {
+    background: #0f0505;
+    padding: 16px;
+    border-radius: 18px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #fbc4c4;
+    border-left: 5px solid #d9534f;
+    margin: 20px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+code {
+    background: #2c1010;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #2a1212;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+th, td {
+    border: 1px solid #aa5e5e;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+th {
+    background: #772d2d;
+    color: #fff0e0;
+}
+
+.example-box {
+    background: #442020;
+    border-left: 6px solid #e09070;
+    padding: 12px 20px;
+    border-radius: 20px;
+    margin: 15px 0;
+    font-size: 0.95rem;
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 2px dashed #b16767;
+    font-size: 0.85rem;
+}
+
+#easterEggTrigger {
+    background: #a14545;
+    padding: 5px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#easterEggTrigger:hover {
+    background: #d46a6a;
+    transform: scale(1.02);
+}
+
+/* Modal WWE */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #3a1818;
+    margin: auto;
+    padding: 25px;
+    border-radius: 32px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    border: 3px solid #d9534f;
+    box-shadow: 0 0 25px #b13b3b;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #f0a0a0;
+}
+
+.wwe-sound {
+    font-family: monospace;
+    margin-top: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Practica GNS3 | Redes CISCO + MikroTik + Alpine</title>
+    <link rel="stylesheet" href="TutorialExamen.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1># GNS3 - Practica Integral: Enrutamiento, VLANs, NAT y OSPF</h1>
+        <p class="subtitle"># Red corporativa con routers Cisco 7200, MikroTik, Switch 3725, Alpine Linux y VPCS</p>
+    </div>
+
+    <!-- BARRA DE BUSQUEDA -->
+    <div class="search-section">
+        <label for="searchInput"># Buscar en la guia:</label>
+        <input type="text" id="searchInput" placeholder="Ejemplo: OSPF, MikroTik, VLAN, DHCP, NAT..." autocomplete="off">
+        <div id="searchClear" class="clear-btn"># Limpiar</div>
+    </div>
+
+    <div id="contentContainer">
+        <!-- SECCION 1: TABLA DE DIRECCIONAMIENTO -->
+        <div class="card" data-searchable>
+            <h2># 1. Plan de subredes y direccionamiento IP</h2>
+            <p>Red base: <strong>172.16.10.0/24</strong>. Se dividio segun necesidades (6,6,18,10 hosts + enlaces punto a punto). Subredes resultantes:</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th># Segmento</th><th>Red / Mascara</th><th>Rango utilizable</th><th>Gateway / IPs relevantes</th></tr></thead>
+                    <tbody>
+                        <tr><td># Red3 (R3 - LAN)</td><td>172.16.10.0/27</td><td>.1 - .30</td><td>Gateway R3: .1 | DHCP .2-.30</td></tr>
+                        <tr><td># Red4 (R4 - LAN)</td><td>172.16.10.32/28</td><td>.33 - .46</td><td>Gateway R4: .33 | PCs estaticas .34,.35</td></tr>
+                        <tr><td># Red1 (VLAN10)</td><td>172.16.10.48/28</td><td>.49 - .62</td><td>Gateway R1: .49 | Servidor estatico .50</td></tr>
+                        <tr><td># Red2 (VLAN20)</td><td>172.16.10.64/28</td><td>.65 - .78</td><td>Gateway R1: .65 | Cliente0 DHCP</td></tr>
+                        <tr><td># Enlace R1-MikroTik</td><td>172.16.10.80/30</td><td>.81 - .82</td><td>MikroTik .81 | R1 g0/0 .82</td></tr>
+                        <tr><td># Enlace R1-R3</td><td>172.16.10.84/30</td><td>.85 - .86</td><td>R1 g1/0 .85 | R3 g0/0 .86</td></tr>
+                        <tr><td># Enlace R3-R4</td><td>172.16.10.88/30</td><td>.89 - .90</td><td>R3 g1/0 .89 | R4 g2/0 .90</td></tr>
+                        <tr><td># Enlace R4-MikroTik</td><td>172.16.10.92/30</td><td>.93 - .94</td><td>R4 f0/0 .93 | MikroTik .94</td></tr>
+                        <tr><td># Red NAT (Internet)</td><td>192.168.10.0/24</td><td>DHCP desde VBox</td><td>MikroTik IP fija .2 (publica simulada)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="example-box">
+                <strong># Ejemplo de calculo de subredes:</strong> Para 18 equipos (Red3) se necesita /27 (32 direcciones, 30 utiles). Para enlaces punto a punto se usa /30 (4 direcciones, 2 utiles). 
+            </div>
+        </div>
+
+        <!-- SECCION 2: TOPOLOGIA Y ELEMENTOS -->
+        <div class="card" data-searchable>
+            <h2># 2. Topologia fisica en GNS3</h2>
+            <ul>
+                <li><strong>R1 (C7200)</strong> - Conexion troncal al Switch2 (g2/0.10 y .20), enlace a MikroTik (g0/0), enlace a R3 (g1/0).</li>
+                <li><strong>R3 (C7200)</strong> - Conexion a R1 (g0/0), a R4 (g1/0) y red interna Red3 (g2/0) con PC3/VPCS.</li>
+                <li><strong>R4 (C7200)</strong> - Conexion a R3 (g2/0), a MikroTik (f0/0) y LAN Red4 (f1/0) con PC4.</li>
+                <li><strong>Switch2 (C3725)</strong> - Trunk f1/0 - R1 g2/0. Access ports: f1/1-f1/8 VLAN10 (Servidor, PC1). f1/9-f1/15 VLAN20 (Cliente0 Alpine).</li>
+                <li><strong>MikroTik RouterOS</strong> - Ether0 (172.16.10.81/30) a R1, Ether1 (172.16.10.94/30) a R4, Ether2 conectado a red NAT VBox (IP fija .2/24).</li>
+                <li><strong>Servidor Alpine</strong> - conectado a VLAN10 (IP fija .50, Apache + SSH).</li>
+                <li><strong>Cliente0 Alpine</strong> - VLAN20, IP por DHCP (R1).</li>
+                <li><strong>PC1, PC3, PC4 (VPCS)</strong> - simulan hosts finales.</li>
+            </ul>
+        </div>
+
+        <!-- SECCION 3: CONFIGURACIONES DETALLADAS -->
+        <div class="card" data-searchable>
+            <h2># 3. Configuracion paso a paso (clave para exito)</h2>
+            <h3># Switch Cisco 3725 (Switch2)</h3>
+            <pre><code>enable
+configure terminal
+vlan 10
+ name RED1_VLAN10
+vlan 20
+ name RED2_VLAN20
+interface range fastEthernet 1/1 - 8
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+interface range fastEthernet 1/9 - 15
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+interface fastEthernet 1/0
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+end
+write memory</code></pre>
+            <div class="example-box">
+                # Explicacion: Se crean dos VLANs (10 y 20). Los puertos del 1/1 al 1/8 pertenecen a la VLAN10 (servidor y PC1). Los puertos 1/9-15 a VLAN20 (cliente0). El puerto 1/0 es troncal hacia R1 y lleva ambas VLANs etiquetadas.
+            </div>
+
+            <h3># Router R1 - DHCP + Subinterfaces + OSPF + default route</h3>
+            <pre><code>conf t
+ip dhcp excluded-address 172.16.10.49 172.16.10.50
+ip dhcp excluded-address 172.16.10.63
+ip dhcp excluded-address 172.16.10.65 172.16.10.79
+!
+ip dhcp pool vlan10
+ network 172.16.10.48 255.255.255.240
+ default-router 172.16.10.49
+ dns-server 8.8.8.8
+!
+ip dhcp pool vlan20
+ network 172.16.10.64 255.255.255.240
+ default-router 172.16.10.65
+ dns-server 8.8.8.8
+!
+interface gigabitEthernet 2/0
+ no ip address
+!
+interface gigabitEthernet 2/0.10
+ encapsulation dot1Q 10
+ ip address 172.16.10.49 255.255.255.240
+!
+interface gigabitEthernet 2/0.20
+ encapsulation dot1Q 20
+ ip address 172.16.10.65 255.255.255.240
+!
+interface gigabitEthernet 0/0
+ ip address 172.16.10.82 255.255.255.252
+ no shutdown
+!
+interface gigabitEthernet 1/0
+ ip address 172.16.10.85 255.255.255.252
+ no shutdown
+!
+router ospf 1
+ router-id 10.10.10.1
+ auto-cost reference-bandwidth 10000
+ network 172.16.10.0 0.0.0.255 area 0
+!
+ip route 0.0.0.0 0.0.0.0 172.16.10.81
+end
+wr</code></pre>
+            <div class="example-box">
+                # Explicacion: R1 actua como gateway para las VLANs 10 y 20 mediante subinterfaces. El servidor (.50) queda excluido del DHCP. Ademas, redistribuye el default route hacia MikroTik y corre OSPF para conocer todas las redes internas.
+            </div>
+
+            <h3># Router R3 - DHCP para Red3 + OSPF</h3>
+            <pre><code>conf t
+ip dhcp excluded-address 172.16.10.1 172.16.10.31
+!
+ip dhcp pool red3
+ network 172.16.10.0 255.255.255.224
+ default-router 172.16.10.1
+ dns-server 8.8.8.8
+!
+interface gigabitEthernet 2/0
+ ip address 172.16.10.1 255.255.255.224
+ no shutdown
+!
+interface gigabitEthernet 0/0
+ ip address 172.16.10.86 255.255.255.252
+ no shutdown
+!
+interface gigabitEthernet 1/0
+ ip address 172.16.10.89 255.255.255.252
+ no shutdown
+!
+router ospf 1
+ router-id 10.10.10.3
+ auto-cost reference-bandwidth 10000
+ network 172.16.10.0 0.0.0.255 area 0
+end
+wr</code></pre>
+
+            <h3># Router R4 - Red4 estatica + OSPF</h3>
+            <pre><code>conf t
+interface fastEthernet 1/0
+ ip address 172.16.10.33 255.255.255.240
+ no shutdown
+!
+interface fastEthernet 0/0
+ ip address 172.16.10.93 255.255.255.252
+ no shutdown
+!
+interface gigabitEthernet 2/0
+ ip address 172.16.10.90 255.255.255.252
+ no shutdown
+!
+router ospf 1
+ router-id 10.10.10.4
+ auto-cost reference-bandwidth 10000
+ network 172.16.10.0 0.0.0.255 area 0
+end
+wr</code></pre>
+
+            <h3># MikroTik RouterOS (NAT, port forwarding, hairpin)</h3>
+            <pre><code>/ip address add address=172.16.10.81/30 interface=ether0
+/ip address add address=172.16.10.94/30 interface=ether1
+/ip address add address=192.168.10.2/24 interface=ether2
+/ip route add gateway=192.168.10.1
+/ip firewall nat add chain=srcnat out-interface=ether2 action=masquerade
+/ip firewall nat add chain=dstnat dst-port=80 protocol=tcp in-interface=ether2 action=dst-nat to-addresses=172.16.10.50 to-ports=80
+/ip firewall nat add chain=dstnat dst-port=2221 protocol=tcp in-interface=ether2 action=dst-nat to-addresses=172.16.10.50 to-ports=22
+/ip firewall nat add chain=srcnat src-address=172.16.10.0/24 dst-address=172.16.10.50 protocol=tcp dst-port=80 out-interface=bridge action=masquerade
+/ip firewall nat add chain=srcnat src-address=172.16.10.0/24 dst-address=172.16.10.50 protocol=tcp dst-port=22 out-interface=bridge action=masquerade
+# Rutas estaticas hacia redes internas via Cisco
+/ip route add dst-address=172.16.10.0/27 gateway=172.16.10.82
+/ip route add dst-address=172.16.10.32/28 gateway=172.16.10.93
+/ip route add dst-address=172.16.10.48/28 gateway=172.16.10.82
+/ip route add dst-address=172.16.10.64/28 gateway=172.16.10.82</code></pre>
+            <div class="example-box">
+                # Explicacion: Se configura NAT masquerade para salida a internet. Ademas, se redirige el puerto 80 (HTTP) y el 2221 (SSH) hacia el servidor interno .50. La regla hairpin permite que desde la LAN se pueda acceder a la IP publica 192.168.10.2.
+            </div>
+
+            <h3># Servidor Alpine (Apache + SSH) - IP estatica</h3>
+            <pre><code># /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 172.16.10.50
+    netmask 255.255.255.240
+    gateway 172.16.10.49
+    dns-nameservers 8.8.8.8
+# Instalar servicios
+apk update
+apk add apache2 openssh
+rc-service apache2 start
+rc-update add apache2 default
+echo "<h1>Servidor Corporativo - GNS3</h1>" > /var/www/localhost/htdocs/index.html</code></pre>
+        </div>
+
+        <!-- SECCION 4: VERIFICACIONES PARA EL VIDEO -->
+        <div class="card" data-searchable>
+            <h2># 4. Verificaciones obligatorias (video final)</h2>
+            <ul>
+                <li># Mostrar <code>cat /etc/alpine-release</code> en Servidor y Cliente0.</li>
+                <li># En MikroTik: <code>:put [/file get routeros.version.txt contents]</code></li>
+                <li># Desde Cliente0: <code>curl -I http://192.168.10.2</code> (debe dar HTTP 200)</li>
+                <li># SSH desde Cliente0: <code>ssh -p 2221 root@192.168.10.2</code></li>
+                <li># Trazas desde PC1 a PC3, PC4, servidor y google.es (ej: <code>trace 172.16.10.34</code>)</li>
+                <li># Desde PC1: <code>curl -I http://192.168.10.2</code></li>
+                <li># Trazas desde PC3 y PC4 a los demas equipos.</li>
+            </ul>
+            <div class="example-box">
+                # Ejemplo de salida esperada en curl -I: <br>
+                HTTP/1.1 200 OK <br>
+                Server: Apache/2.4.62 (Alpine)
+            </div>
+        </div>
+
+        <!-- SECCION 5: CHECKLIST FINAL -->
+        <div class="card" data-searchable>
+            <h2># 5. Puntos criticos para que todo funcione</h2>
+            <ul>
+                <li># Verificar que el switch tiene los puertos en las VLANs correctas (acceso y trunk).</li>
+                <li># Asegurar que el servidor tenga IP fija fuera del rango DHCP.</li>
+                <li># Comprobar vecinos OSPF: <code>show ip ospf neighbor</code> en R1, R3, R4.</li>
+                <li># La ruta por defecto en R1 apunta a MikroTik (.81). MikroTik apunta a VBox (.1).</li>
+                <li># El firewall de MikroTik debe permitir el forward.</li>
+                <li># Desde cualquier equipo interno hacer ping a 8.8.8.8 para validar salida a internet.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p># Practica GNS3 - Entornos avanzados | Documentacion completa | <span id="easterEggTrigger"># WWE SECRET [Click aqui]</span></p>
+    </footer>
+</div>
+
+<div id="easterEggModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2># STONE COLD STEVE AUSTIN</h2>
+        <p>"And that's the bottom line, 'cause Stone Cold said so!"</p>
+        <img src="https://upload.wikimedia.org/wikipedia/en/5/5e/Stonecold.png" alt="Stone Cold Steve Austin" style="max-width:100%; border-radius:12px;">
+        <p class="wwe-sound"># Glass shatters!   [Austin 3:16]</p>
+    </div>
+</div>
+
+<script src="TutorialExamen.js"></script>
+</body>
+</html>
