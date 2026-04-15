@@ -1,0 +1,1 @@
+Formatting '/home/soutes/GNS3/projects/Testing - A$AP/project-files/qemu/3bd013c7-b112-4040-b45f-1157c9d098f3/hda_disk.qcow2', fmt=qcow2 cluster_size=65536 extended_l2=off compression_type=zlib size=134217728 backing_file=/home/soutes/GNS3/images/QEMU/chr-7.16.img backing_fmt=raw lazy_refcounts=off refcount_bits=16
