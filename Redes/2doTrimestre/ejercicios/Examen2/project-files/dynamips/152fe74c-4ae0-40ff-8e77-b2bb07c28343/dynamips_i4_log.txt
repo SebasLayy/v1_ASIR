@@ -1,0 +1,61 @@
+Feb 19 08:46:44.644 HYPERVISOR: Release 0.2.23-amd64/Linux (tag 2023010200)
+Feb 19 08:46:44.644 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 41733.
+Feb 19 08:46:44.652 HYPERVISOR: exec_cmd: hypervisor version 
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: hypervisor working_dir /home/soutes/GNS3/projects/Examen2/project-files/dynamips 
+Feb 19 08:46:44.653 GENERAL: working_dir=/home/soutes/GNS3/projects/Examen2/project-files/dynamips
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: hypervisor working_dir /home/soutes/GNS3/projects/Examen2/project-files/dynamips/903ed5e7-fadc-401d-9621-0ab2a1655c95 
+Feb 19 08:46:44.653 GENERAL: working_dir=/home/soutes/GNS3/projects/Examen2/project-files/dynamips/903ed5e7-fadc-401d-9621-0ab2a1655c95
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: vm create R1 1 c7200 
+Feb 19 08:46:44.653 VM: VM R1 created.
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 5003 
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: c7200 get_mac_addr R1 
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: vm slot_add_binding R1 0 0 C7200-IO-FE 
+Feb 19 08:46:44.653 HYPERVISOR: exec_cmd: vm set_disk0 R1 0 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm set_ios R1 /home/soutes/GNS3/images/IOS/c7200-adventerprisek9-mz.152-4.M7.image 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: c7200 set_mac_addr R1 ca01.1f62.0000 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm set_nvram R1 512 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm set_ram R1 512 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm slot_remove_binding R1 0 0 
+Feb 19 08:46:44.654 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm slot_add_binding R1 0 0 C7200-IO-GE-E 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm slot_add_binding R1 1 0 PA-GE 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm slot_add_binding R1 2 0 PA-GE 
+Feb 19 08:46:44.655 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 5003 
+Feb 19 08:46:45.080 HYPERVISOR: exec_cmd: nio create_udp udp-534e5a4c-369a-4f25-912c-76d0408919b2 10002 127.0.0.1 10003 
+Feb 19 08:46:45.286 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 1 0 udp-534e5a4c-369a-4f25-912c-76d0408919b2 
+Feb 19 08:46:45.286 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:46:45.820 HYPERVISOR: exec_cmd: nio create_udp udp-19b7a281-348f-41f4-84ce-32be40230dbc 10022 127.0.0.1 10023 
+Feb 19 08:46:45.821 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 2 0 udp-19b7a281-348f-41f4-84ce-32be40230dbc 
+Feb 19 08:46:45.821 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:47:06.241 HYPERVISOR: exec_cmd: vm set_ghost_status R1 2 
+Feb 19 08:47:06.241 HYPERVISOR: exec_cmd: vm set_ghost_file R1 /home/soutes/GNS3/projects/Examen2/project-files/dynamips/c7200-adventerprisek9-mz.152-4.M7.image-512.ghost 
+Feb 19 08:47:06.242 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 08:47:06.242 HYPERVISOR: exec_cmd: vm set_config R1 configs/i1_startup-config.cfg 
+Feb 19 08:47:06.242 HYPERVISOR: exec_cmd: vm start R1 
+Feb 19 08:47:36.471 HYPERVISOR: exec_cmd: vm extract_config R1 
+Feb 19 08:54:13.195 HYPERVISOR: exec_cmd: vm set_ios R1 /home/soutes/GNS3/images/IOS/c7200-adventerprisek9-mz.152-4.M7.image 
+Feb 19 09:01:36.507 HYPERVISOR: exec_cmd: vm extract_config R1 
+Feb 19 09:08:46.637 HYPERVISOR: exec_cmd: vm set_ios R1 /home/soutes/GNS3/images/IOS/c7200-adventerprisek9-mz.152-4.M7.image 
+Feb 19 09:22:36.564 HYPERVISOR: exec_cmd: vm extract_config R1 
+Feb 19 09:28:39.524 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 09:28:39.524 HYPERVISOR: exec_cmd: vm stop R1 
+Feb 19 09:28:39.562 VM: VM R1 shutdown.
+Feb 19 09:28:39.563 HYPERVISOR: exec_cmd: vm extract_config R1 
+Feb 19 09:29:09.533 HYPERVISOR: exec_cmd: nio create_udp udp-5f89a7dc-58ad-4dd4-a80c-d138351962af 10036 127.0.0.1 10037 
+Feb 19 09:29:09.535 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-5f89a7dc-58ad-4dd4-a80c-d138351962af 
+Feb 19 09:29:09.535 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 09:29:09.586 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 09:29:09.586 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R1 0 0 
+Feb 19 09:29:09.587 HYPERVISOR: exec_cmd: nio delete udp-5f89a7dc-58ad-4dd4-a80c-d138351962af 
+Feb 19 09:29:27.692 HYPERVISOR: exec_cmd: nio create_udp udp-ebd544d5-f02d-4055-b506-9362233034e9 10037 127.0.0.1 10046 
+Feb 19 09:29:27.692 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-ebd544d5-f02d-4055-b506-9362233034e9 
+Feb 19 09:29:27.693 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 09:30:02.440 HYPERVISOR: exec_cmd: vm set_ghost_status R1 2 
+Feb 19 09:30:02.440 HYPERVISOR: exec_cmd: vm set_ghost_file R1 /home/soutes/GNS3/projects/Examen2/project-files/dynamips/c7200-adventerprisek9-mz.152-4.M7.image-512.ghost 
+Feb 19 09:30:02.440 HYPERVISOR: exec_cmd: vm get_status R1 
+Feb 19 09:30:02.441 HYPERVISOR: exec_cmd: vm set_config R1 configs/i1_startup-config.cfg configs/i1_private-config.cfg 
+Feb 19 09:30:02.441 HYPERVISOR: exec_cmd: vm start R1 
