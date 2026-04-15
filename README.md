@@ -7,7 +7,7 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
 
-> *“El conocimiento se comparte, el código se recuerda, y ASIR se vive con café y persistencia.”* ☕💻
+> *“El conocimiento se comparte, el código se recuerda, y ASIR se vive con calma... y los comandos se pueden ir a la s”* ☕💻
 
 ## 📖 ¿Qué es esto?
 
@@ -28,7 +28,7 @@ Pero esto no es solo un repositorio de backups… es:
 | 🗄️ **Bases de Datos** | SQL, diseño ER, normalización, consultas complejas, MongoDB (si cae) |
 | 📋 **ISO** | Implantación de Sistemas Operativos: Linux, Windows, virtualización, scripting |
 | 🏷️ **Lenguaje de Marcas** | XML, JSON, HTML5, CSS3, XSLT, y por supuesto… ¡webs molonas! |
-| ☕ **Programación** | Java (puro), estructuras de datos, POO, algoritmia, y pequeños proyectos |
+| ☕ **Programación** | Python (puro), estructuras de datos, POO, algoritmia, y pequeños proyectos |
 
 Además, hay una sección especial de **AI Playground** donde uso prompts de inteligencia artificial para generar fragmentos de código, explicaciones y hasta ejercicios completos.
 
