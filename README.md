@@ -1,7 +1,7 @@
 # 🚀 v1_ASIR - Mi viaje por el Ciclo de ASIR
 
-![GitHub repo size](https://img.shields.io/github/repo-size/tuusuario/v1_ASIR?style=flat-square&logo=github)
-![GitHub last commit](https://img.shields.io/github/last-commit/tuusuario/v1_ASIR?style=flat-square&logo=git)
+![GitHub repo size](https://img.shields.io/github/repo-size/SebasLayy/v1_ASIR?style=flat-square&logo=github)
+![GitHub last commit](https://img.shields.io/github/last-commit/tSebasLayy/v1_ASIR?style=flat-square&logo=git)
 ![Made with Markdown](https://img.shields.io/badge/Made%20with-Markdown-1f425f?style=flat-square&logo=markdown)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
@@ -78,9 +78,9 @@ Este repo es personal y educativo, pero si eres un compañero de clase o un futu
 ✅ En desarrollo activo durante el primer año de ASIR.
 📅 Se irá actualizando con cada práctica, examen o idea que surja.
 🔁 Para segundo curso planeo crear v2_ASIR con nuevas asignaturas y proyectos más gordos.
-
+```
 🧑‍💻 Autor
-Tu nombre aquí – Estudiante de ASIR con ganas de aprender, compartir y no olvidar ni un solo comando.
+Sebas Outes – Estudiante de ASIR con ganas de aprender, compartir y no olvidar ni un solo comando.
 
 GitHub: @SebasLayy
 
