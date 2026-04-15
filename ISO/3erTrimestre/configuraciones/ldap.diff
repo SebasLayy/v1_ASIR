@@ -1,0 +1,67 @@
+version: 1
+
+dn: dc=ldap,dc=sebasoutes,dc=local
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: sebasoutes
+dc: ldap
+
+dn: ou=usuarios,dc=ldap,dc=sebasoutes,dc=local
+objectClass: organizationalUnit
+ou: usuarios
+
+dn: ou=grupos,dc=ldap,dc=sebasoutes,dc=local
+objectClass: organizationalUnit
+ou: grupos
+
+dn: cn=outes,ou=grupos,dc=ldap,dc=sebasoutes,dc=local
+objectClass: posixGroup
+cn: outes
+gidNumber: 501
+
+dn: uid=sebas1,ou=usuarios,dc=ldap,dc=sebasoutes,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: sebas1
+sn: sebas1
+givenName: sebas1
+cn: sebas1
+displayName: sebas1
+uidNumber: 1010
+gidNumber: 501
+loginShell: /bin/bash
+homeDirectory: /home/sebas1
+mail: sebas1@ldap.sebasoutes.local
+
+dn: uid=sebas2,ou=usuarios,dc=ldap,dc=sebasoutes,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: sebas2
+sn: sebas2
+givenName: sebas2
+cn: sebas2
+displayName: sebas2
+uidNumber: 1011
+gidNumber: 501
+loginShell: /bin/bash
+homeDirectory: /home/sebas2
+mail: sebas2@ldap.sebasoutes.local
+
+dn: uid=sebas3,ou=usuarios,dc=ldap,dc=sebasoutes,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: sebas3
+sn: sebas3
+givenName: sebas3
+cn: sebas3
+displayName: sebas3
+uidNumber: 1012
+gidNumber: 501
+loginShell: /bin/bash
+homeDirectory: /home/sebas3
+mail: sebas3@ldap.sebasoutes.local
+
