@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Práctica HPC: LDAP + NFS + Slurm + Modules | Guía completa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #121212;
+            background-image: radial-gradient(circle at 15% 40%, rgba(255, 200, 0, 0.08) 1px, transparent 1px);
+            background-size: 35px 35px;
+            font-family: 'Inter', sans-serif;
+            color: #e6e6e6;
+            line-height: 1.5;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #1a1a1f;
+            border-radius: 32px;
+            border: 1px solid #f0b90b;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(240, 185, 11, 0.2);
+            padding: 2rem 1.8rem;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #f0b90b;
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9d976, #f0b90b, #e09d00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .header p {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .badge-practice {
+            display: inline-block;
+            background: #2a2a2a;
+            border: 1px solid #f0b90b;
+            border-radius: 40px;
+            padding: 0.25rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #f0b90b;
+            margin-top: 0.7rem;
+            font-family: monospace;
+        }
+
+        .search-container {
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        #searchInput {
+            width: 100%;
+            max-width: 600px;
+            background: #0f0f12;
+            border: 1px solid #f0b90b;
+            border-radius: 60px;
+            padding: 0.8rem 1.5rem;
+            color: #f5e6c4;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        #searchInput:focus {
+            border-color: #ffcd4a;
+            box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.3);
+        }
+        .search-info {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #f0b90b;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem 1.2rem;
+            background: #0e0e12cc;
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #f0b90b66;
+            backdrop-filter: blur(4px);
+            position: sticky;
+            top: 12px;
+            z-index: 20;
+        }
+        .quick-nav a {
+            text-decoration: none;
+            color: #ffdd99;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: 0.1s;
+            border-bottom: 1px dashed #f0b90b;
+        }
+        .quick-nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 3px #f0b90b;
+        }
+
+        .phase-card {
+            background: #1e1e24e6;
+            border: 1px solid #f0b90b55;
+            border-radius: 28px;
+            padding: 1.4rem 1.8rem;
+            margin-bottom: 2rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .phase-card:hover {
+            border-color: #f0b90b;
+            box-shadow: 0 0 12px rgba(240, 185, 11, 0.2);
+        }
+        .phase-card h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            border-left: 5px solid #f0b90b;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            color: #ffe0a3;
+        }
+        .phase-card h3 {
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem;
+            color: #f7d97a;
+        }
+        .code-block {
+            background: #0c0c10;
+            border-left: 4px solid #f0b90b;
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #efefcf;
+            margin: 1rem 0;
+        }
+        .inline-code {
+            background: #2a2a2f;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #f0b90b;
+        }
+        .note {
+            background: #2a2a24c9;
+            border-left: 4px solid #f0b90b;
+            padding: 0.7rem 1.2rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+        }
+        .warning {
+            border-left-color: #ffaa33;
+            background: #2f2a1fc9;
+        }
+        .deliverable {
+            background: #202024;
+            border: 1px solid #f0b90b88;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, #f0b90b00, #f0b90b, #f0b90b00);
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            color: #a0a0a0;
+            border-top: 1px solid #f0b90b40;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .highlight {
+            background: #f0b90b99;
+            color: #0c0c10;
+            border-radius: 6px;
+            padding: 0 2px;
+            font-weight: 500;
+        }
+        .easter-egg {
+            display: inline-block;
+            transition: 0.1s;
+        }
+        .easter-egg:active {
+            text-shadow: 0 0 6px #ff6600;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .phase-card { padding: 1rem; }
+            .quick-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📡 Práctica Clúster HPC: LDAP + NFS + Slurm + Modules</h1>
+        <p>Autenticación centralizada, almacenamiento compartido y gestor de colas para cómputo de alto rendimiento</p>
+        <div class="badge-practice">Ubuntu Server 24.04 | 4 nodos | VirtualBox</div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔎 Buscar en la guía (ej: munge, autofs, slurm.conf, partición, ldap)">
+    </div>
+    <div class="search-info" id="searchInfo">📌 Usa la búsqueda para encontrar comandos o pasos específicos</div>
+
+    <div class="quick-nav">
+        <a href="#intro">🎯 ¿Qué es?</a>
+        <a href="#arquitectura">🏛️ Arquitectura</a>
+        <a href="#red">🌐 Red NAT</a>
+        <a href="#ips">🖧 IPs estáticas</a>
+        <a href="#ldap">📁 LDAP</a>
+        <a href="#nfs">💾 NFS+autofs</a>
+        <a href="#slurm">⚙️ Slurm</a>
+        <a href="#modules">📦 Modules</a>
+        <a href="#entregables">📎 Entregables</a>
+    </div>
+
+    <!-- INTRO: explicación clara de la práctica -->
+    <div id="intro" class="phase-card">
+        <h2>🎯 ¿Qué vamos a construir?</h2>
+        <p>Un clúster de cómputo formado por 4 máquinas virtuales donde:</p>
+        <ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">
+            <li><span class="inline-code">LDAP</span> centraliza los usuarios (sebas1, sebas2, sebas3) y el grupo <strong>outes</strong>.</li>
+            <li><span class="inline-code">NFS</span> comparte los directorios <strong>/home</strong> y <strong>/opt/apps</strong> desde el servidor.</li>
+            <li><span class="inline-code">autofs</span> monta automáticamente los homes en los nodos de cómputo.</li>
+            <li><span class="inline-code">Slurm</span> gestiona trabajos en dos particiones: <strong>outes1</strong> (nodo1) y <strong>outes2</strong> (nodos 2 y 3).</li>
+            <li><span class="inline-code">Environment Modules</span> permite cargar entornos de software dinámicamente.</li>
+        </ul>
+        <div class="note">✅ Esta infraestructura es típica en centros de supercomputación: gestión unificada de usuarios, almacenamiento compartido y planificación de tareas.</div>
+    </div>
+
+    <!-- ARQUITECTURA -->
+    <div id="arquitectura" class="phase-card">
+        <h2>🏛️ Arquitectura final (clúster con 4 nodos)</h2>
+        <div class="code-block">
+[PC anfitrión]  →  SSH puerto 2222  →  Computer-0-0 (10.0.2.10) [LDAP + NFS + slurmctld]
+                                      │
+                         ┌────────────┼────────────┐
+                         ↓            ↓            ↓
+              computer-0-1      computer-0-2     computer-0-3
+              172.16.0.11       172.16.0.12      172.16.0.13
+              cliente LDAP      cliente LDAP     cliente LDAP
+              autofs NFS        autofs NFS       autofs NFS
+              slurmd            slurmd           slurmd
+
+Dominio LDAP: ldap.sebasoutes.local   Grupo: outes (gid 501)   Usuarios: sebas1, sebas2, sebas3
+Particiones Slurm: outes1 → computer-0-1 , outes2 → computer-0-2 y computer-0-3
+        </div>
+        <div class="note">🔗 Todos los nodos tienen internet a través de Computer-0-0 (enrutamiento NAT). Los homes y /opt/apps se comparten por NFS.</div>
+    </div>
+
+    <!-- RED NAT -->
+    <div id="red" class="phase-card">
+        <h2>🌐 1. Red NAT en VirtualBox y clones enlazados</h2>
+        <ul>
+            <li><strong>Red NAT</strong>: nombre <span class="inline-code">NatLDAP</span>, prefijo <span class="inline-code">10.0.2.0/24</span>, <strong>DHCP deshabilitado</strong>.</li>
+            <li>Reenvío de puertos: TCP, puerto anfitrión <span class="inline-code">2222</span> → IP invitado <span class="inline-code">10.0.2.10:22</span>.</li>
+            <li>VM base: Ubuntu Server 24.04 (2CPU, 2GB RAM, 200GB disco), usuario <span class="inline-code">soutes</span>, OpenSSH instalado.</li>
+        </ul>
+        <h3>Clones enlazados</h3>
+        <ul>
+            <li><span class="inline-code">Computer-0-0</span> : NAT + red interna "intnet" → IP 172.16.0.10/16</li>
+            <li><span class="inline-code">computer-0-1</span> : solo red interna → IP 172.16.0.11/16</li>
+            <li>Clonar computer-0-1 → <span class="inline-code">computer-0-2</span> (172.16.0.12) y <span class="inline-code">computer-0-3</span> (172.16.0.13)</li>
+        </ul>
+    </div>
+
+    <!-- IPs estáticas + enrutamiento -->
+    <div id="ips" class="phase-card">
+        <h2>🖧 2. Configuración de IPs estáticas (netplan) y enrutamiento</h2>
+        <h3>Computer-0-0 (controlador)</h3>
+        <div class="code-block">network:
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses: [10.0.2.10/24]
+      routes: [ { to: default, via: 10.0.2.1 } ]
+      nameservers: { addresses: [8.8.8.8] }
+    enp0s8:
+      dhcp4: no
+      addresses: [172.16.0.10/16]
+  version: 2</div>
+        <h3>Nodos compute (0-1,0-2,0-3) - cada uno con su IP</h3>
+        <div class="code-block">network:
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses: [172.16.0.11/16]   # .12 y .13 para los otros
+      routes: [ { to: default, via: 172.16.0.10 } ]
+      nameservers: { addresses: [8.8.8.8] }
+  version: 2</div>
+        <h3>Habilitar forwarding y NAT (en Computer-0-0)</h3>
+        <div class="code-block">sudo apt install iptables-persistent -y
+sudo iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+sudo iptables -A FORWARD -i enp0s8 -j ACCEPT
+sudo netfilter-persistent save
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p</div>
+        <div class="note">✔️ Comprobar: desde computer-0-1 <span class="inline-code">ping google.com</span> → debe funcionar.</div>
+    </div>
+
+    <!-- SSH sin contraseña -->
+    <div class="phase-card">
+        <h2>🔑 3. SSH sin contraseña entre nodos (root)</h2>
+        <div class="code-block"># En TODOS los nodos:
+sudo passwd root      # contraseña: alumno
+sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+
+# En Computer-0-0 como root:
+ssh-keygen -t rsa
+for ip in 172.16.0.10 172.16.0.11 172.16.0.12 172.16.0.13; do
+  ssh-copy-id root@$ip
+done</div>
+        <p>Añadir entradas en <span class="inline-code">/etc/hosts</span> de todas las máquinas:</p>
+        <div class="code-block">172.16.0.10  Computer-0-0  ldap.sebasoutes.local
+172.16.0.11  computer-0-1
+172.16.0.12  computer-0-2
+172.16.0.13  computer-0-3</div>
+    </div>
+
+    <!-- LDAP servidor + clientes -->
+    <div id="ldap" class="phase-card">
+        <h2>📁 4. Servidor LDAP (Computer-0-0) y clientes</h2>
+        <div class="code-block">sudo apt install slapd ldap-utils -y
+sudo dpkg-reconfigure slapd</div>
+        <ul>
+            <li>Dominio DNS: <span class="inline-code">ldap.sebasoutes.local</span></li>
+            <li>Organización: <span class="inline-code">sebasoutes</span> · Contraseña admin: <span class="inline-code">alumno</span></li>
+            <li>Backend: MDB · No eliminar al purgar</li>
+        </ul>
+        <h3>Crear estructura, grupo outes y usuarios sebas1,2,3</h3>
+        <div class="code-block"># OUs
+cat > estructura.ldif << EOF
+dn: ou=usuarios,dc=ldap,dc=sebasoutes,dc=local
+objectClass: organizationalUnit
+ou: usuarios
+dn: ou=grupos,dc=ldap,dc=sebasoutes,dc=local
+objectClass: organizationalUnit
+ou: grupos
+EOF
+ldapadd -x -D cn=admin,dc=ldap,dc=sebasoutes,dc=local -W -f estructura.ldif
+
+# Grupo outes (gid 501)
+cat > grupo.ldif << EOF
+dn: cn=outes,ou=grupos,dc=ldap,dc=sebasoutes,dc=local
+objectClass: posixGroup
+cn: outes
+gidNumber: 501
+EOF
+ldapadd -x -D cn=admin,dc=ldap,dc=sebasoutes,dc=local -W -f grupo.ldif
+
+# Usuarios (uidNumber 1010,1011,1012) con home y contraseña "sebas1", etc.
+ldapadd -x -D cn=admin,dc=ldap,dc=sebasoutes,dc=local -W -f usuarios.ldif</div>
+        <h3>Clientes LDAP (Computer-0-0 y todos los nodos)</h3>
+        <div class="code-block">sudo apt install libnss-ldap libpam-ldap ldap-utils nscd -y
+# URI: ldap://172.16.0.10 , base: dc=ldap,dc=sebasoutes,dc=local
+sudo nano /etc/nsswitch.conf   # passwd: files ldap , group: files ldap
+sudo pam-auth-update   # marcar "Create home directory on login"
+sudo systemctl restart nscd
+getent passwd | grep sebas   # sebas1,sebas2,sebas3 visibles</div>
+    </div>
+
+    <!-- NFS + autofs -->
+    <div id="nfs" class="phase-card">
+        <h2>💾 5. NFS Server (Computer-0-0) + autofs en clientes</h2>
+        <div class="code-block">sudo apt install nfs-kernel-server -y
+# Crear los homes si no existen
+su sebas1; exit; su sebas2; exit; su sebas3; exit
+sudo mkdir -p /opt/apps
+echo "/home      172.16.0.0/16(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+echo "/opt/apps  172.16.0.0/16(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+sudo exportfs -a && sudo systemctl restart nfs-kernel-server</div>
+        <h3>autofs en cada nodo (0-1,0-2,0-3)</h3>
+        <div class="code-block">sudo apt install autofs -y
+echo "/home      /etc/auto.home" | sudo tee -a /etc/auto.master
+echo "/opt/apps  /etc/auto.apps" | sudo tee -a /etc/auto.master
+echo "*  172.16.0.10:/home/&" | sudo tee /etc/auto.home
+echo "apps  172.16.0.10:/opt/apps" | sudo tee /etc/auto.apps
+sudo systemctl restart autofs</div>
+        <div class="warning">⚠️ Si autofs no monta /opt/apps, solución rápida: añadir a /etc/fstab <span class="inline-code">172.16.0.10:/opt/apps /opt/apps nfs defaults 0 0</span> y hacer mount -a.</div>
+    </div>
+
+    <!-- Sincronización horaria (crucial) -->
+    <div class="phase-card">
+        <h2>⏱️ 6. Sincronización horaria (indispensable para Munge/Slurm)</h2>
+        <div class="code-block"># En todos los nodos
+sudo apt install chrony -y
+sudo systemctl enable chrony --now
+sudo chronyc makestep</div>
+        <div class="note">🔧 El error "Header lengths longer than data" se debe a relojes desincronizados o clave munge diferente. Chrony lo resuelve.</div>
+    </div>
+
+    <!-- SLURM -->
+    <div id="slurm" class="phase-card">
+        <h2>⚙️ 7. Slurm: controlador + slurmd + Munge</h2>
+        <h3>Munge (clave común)</h3>
+        <div class="code-block"># Computer-0-0
+sudo systemctl stop munge
+sudo rm -f /etc/munge/munge.key
+sudo dd if=/dev/urandom bs=1 count=1024 of=/etc/munge/munge.key
+sudo chmod 400 /etc/munge/munge.key && sudo chown munge:munge /etc/munge/munge.key
+
+for i in 1 2 3; do
+  sudo scp /etc/munge/munge.key root@172.16.0.1$i:/etc/munge/
+  ssh root@172.16.0.1$i "chown munge:munge /etc/munge/munge.key && chmod 400 /etc/munge/munge.key && systemctl restart munge"
+done
+sudo systemctl start munge</div>
+        <h3>slurm.conf (corregido con SlurmUser y DebugFlags)</h3>
+        <div class="code-block">sudo tee /etc/slurm/slurm.conf << 'EOF'
+ClusterName=cluster
+SlurmctldHost=Computer-0-0
+AuthType=auth/munge
+SlurmUser=slurm
+DebugFlags=NO_CONF_HASH
+MpiDefault=none
+ProctrackType=proctrack/pgid
+ReturnToService=2
+TaskPlugin=task/none
+SlurmctldPidFile=/var/run/slurmctld.pid
+SlurmdPidFile=/var/run/slurmd.pid
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdLogFile=/var/log/slurm/slurmd.log
+StateSaveLocation=/var/spool/slurmctld
+SlurmdSpoolDir=/var/spool/slurmd
+SchedulerType=sched/backfill
+SelectType=select/linear
+
+NodeName=computer-0-1 NodeAddr=172.16.0.11 CPUs=2 Sockets=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1900 State=UNKNOWN
+NodeName=computer-0-2 NodeAddr=172.16.0.12 CPUs=2 Sockets=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1900 State=UNKNOWN
+NodeName=computer-0-3 NodeAddr=172.16.0.13 CPUs=2 Sockets=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1900 State=UNKNOWN
+
+PartitionName=outes1 Nodes=computer-0-1 Default=YES MaxTime=INFINITE State=UP
+PartitionName=outes2 Nodes=computer-0-2,computer-0-3 MaxTime=INFINITE State=UP
+EOF</div>
+        <p>Distribuir configuración y arrancar servicios:</p>
+        <div class="code-block">for i in 1 2 3; do
+  scp /etc/slurm/slurm.conf root@172.16.0.1$i:/etc/slurm/
+  ssh root@172.16.0.1$i "systemctl restart munge && systemctl restart slurmd"
+done
+sudo systemctl restart slurmctld
+sinfo   # debe mostrar outes1 y outes2 con nodos idle</div>
+        <div class="warning">🔄 Si los nodos aparecen en "completing*", limpiar spool: <span class="inline-code">sudo rm -rf /var/spool/slurmctld/* ; for i in 1 2 3; do ssh root@172.16.0.1$i "rm -rf /var/spool/slurmd/* && systemctl restart slurmd"; done; sudo systemctl restart slurmctld</span></div>
+    </div>
+
+    <!-- Environment Modules -->
+    <div id="modules" class="phase-card">
+        <h2>📦 8. Environment Modules + ejecutable de prueba</h2>
+        <div class="code-block">sudo apt install environment-modules -y
+source /etc/profile.d/modules.sh
+
+sudo mkdir -p /opt/apps/testbin
+sudo tee /opt/apps/testbin/test.x << 'EOF'
+#!/bin/bash
+echo "hola $(whoami)"
+date
+EOF
+sudo chmod a+x /opt/apps/testbin/test.x
+
+sudo mkdir -p /usr/share/modules/modulefiles/test
+sudo tee /usr/share/modules/modulefiles/test/1.0 << 'EOF'
+#%Module1.0
+proc ModulesHelp {} { puts stderr "Módulo test - binario en /opt/apps/testbin" }
+module-whatis "Ejecutable test.x"
+prepend-path PATH /opt/apps/testbin
+EOF</div>
+        <p>Copiar modulefile a los nodos de cómputo:</p>
+        <div class="code-block">for i in 1 2 3; do
+  scp -r /usr/share/modules/modulefiles/test root@172.16.0.1$i:/usr/share/modules/modulefiles/
+done</div>
+    </div>
+
+    <!-- Lanzar script Slurm -->
+    <div class="phase-card">
+        <h2>🚀 9. Lanzar trabajo con Slurm (partición outes2)</h2>
+        <div class="code-block">su - sebas1   # importante el guión para ir a su home
+cat > ~/script.sh << 'EOF'
+#!/bin/bash
+#SBATCH --job-name=test_modules
+#SBATCH --output=/home/sebas1/salida
+#SBATCH --partition=outes2
+
+source /etc/profile.d/modules.sh
+module load test/1.0
+test.x
+EOF
+
+sbatch ~/script.sh
+sleep 8
+cat ~/salida
+# Salida esperada: "hola sebas1" + fecha actual</div>
+        <div class="note">✅ El trabajo se ejecutará en computer-0-2 o computer-0-3. Verificar con <span class="inline-code">squeue</span> y <span class="inline-code">sinfo</span>.</div>
+    </div>
+
+    <!-- ENTREGABLES -->
+    <div id="entregables" class="phase-card">
+        <h2>📎 Entregables (Ejercicio 01 y 02)</h2>
+        <div class="deliverable">
+            <strong>📁 EJERCICIO 01</strong><br>
+            • Desde <span class="inline-code">computer-0-1</span>: <span class="inline-code">getent passwd | tail</span> → captura mostrando sebas1, sebas2, sebas3.<br>
+            • Desde <span class="inline-code">Computer-0-0</span>: <span class="inline-code">sudo ldapsearch -xLL -b "dc=ldap,dc=sebasoutes,dc=local" > ldap.diff</span> → subir el archivo.
+        </div>
+        <div class="deliverable">
+            <strong>⚙️ EJERCICIO 02</strong><br>
+            • Captura de <span class="inline-code">sinfo</span> con las particiones <strong>outes1</strong> y <strong>outes2</strong> y nodos idle.<br>
+            • Captura de <span class="inline-code">cat /home/sebas1/salida</span> mostrando "hola sebas1 + fecha".<br>
+            • Demostración en vivo al profesor.
+        </div>
+        <div class="warning">🔐 Si el login como sebas1 via SSH falla, reiniciar contraseña LDAP: <span class="inline-code">ldappasswd -x -D cn=admin,dc=ldap,dc=sebasoutes,dc=local -W -S uid=sebas1,ou=usuarios,dc=ldap,dc=sebasoutes,dc=local</span> (contraseña: sebas1).</div>
+    </div>
+
+    <div class="phase-card">
+        <h2>🛠️ Solución de problemas comunes</h2>
+        <ul>
+            <li><span class="inline-code">munge: Header lengths</span> → chrony + regenerar clave munge.</li>
+            <li><span class="inline-code">Nodos Slurm DOWN/DRAIN</span> → <span class="inline-code">scontrol update nodename=computer-0-X state=RESUME</span> o limpiar spool.</li>
+            <li><span class="inline-code">RealMemory mismatch</span> → ejecutar <span class="inline-code">slurmd -C</span> en cada nodo y ajustar slurm.conf.</li>
+            <li><span class="inline-code">autofs no monta /opt/apps</span> → montaje vía fstab como se indica arriba.</li>
+            <li><span class="inline-code">getent passwd sin usuarios LDAP</span> → verificar /etc/nsswitch.conf, /etc/hosts y reiniciar nscd.</li>
+        </ul>
+    </div>
+
+    <footer id="footer">
+        <span class="easter-egg" onclick="alert('⚡🔥 ¡EDGERUNNERS! 🔥⚡\n\"I really want to stay at your house\" — Sistema montado, clúster listo para producción.')">✨ Guía completa para clúster HPC — haz clic aquí ✨</span>
+        <br><span style="font-size:0.7rem;">LDAP + NFS + Slurm + Modules · Ubuntu 24.04 · Basado en práctica real (sebas/outes)</span>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchInfo = document.getElementById('searchInfo');
+        const cards = document.querySelectorAll('.phase-card');
+        let originalContents = [];
+        cards.forEach(card => { originalContents.push(card.innerHTML); });
+
+        function restoreAll() {
+            cards.forEach((card, idx) => {
+                card.innerHTML = originalContents[idx];
+                card.style.display = 'block';
+            });
+        }
+
+        function highlightAndFilter() {
+            const term = searchInput.value.trim().toLowerCase();
+            if (term === "") {
+                restoreAll();
+                searchInfo.innerText = "📌 Búsqueda despejada — mostrando todas las secciones";
+                return;
+            }
+            let matches = 0;
+            cards.forEach((card, idx) => {
+                const original = originalContents[idx];
+                const textMatch = original.toLowerCase().includes(term);
+                if (textMatch) {
+                    matches++;
+                    let highlighted = original;
+                    const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    highlighted = highlighted.replace(regex, `<span class="highlight">$1</span>`);
+                    card.innerHTML = highlighted;
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            if (matches === 0) {
+                searchInfo.innerText = `❌ No se encontró "${term}" — prueba con: munge, autofs, slurm.conf, particion, ldap, nfs`;
+                cards.forEach(c => c.style.display = 'none');
+            } else {
+                searchInfo.innerText = `🔍 ${matches} sección(es) coinciden con "${term}"`;
+            }
+        }
+
+        searchInput.addEventListener('input', highlightAndFilter);
+    })();
+</script>
+</body>
+</html>
