@@ -1,0 +1,245 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
+    color: #f0f0f0;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+.app-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(20, 24, 35, 0.85);
+    backdrop-filter: blur(2px);
+    border-radius: 32px;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    padding: 20px 18px 30px;
+    border: 1px solid rgba(255, 160, 0, 0.3);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #FFB347, #FF6B6B);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: -0.5px;
+}
+
+header p {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.schema-badge {
+    background: #2e3b4e;
+    border-radius: 60px;
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: monospace;
+    border-left: 4px solid #ffaa44;
+    word-break: break-word;
+}
+
+.query-area {
+    background: #0f121c;
+    border-radius: 24px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+}
+
+.query-area label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #FFD966;
+}
+
+#sqlEditor {
+    width: 100%;
+    background: #010101;
+    color: #00ffcc;
+    border: 1px solid #ffaa44;
+    border-radius: 20px;
+    padding: 14px;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+    transition: 0.2s;
+}
+
+#sqlEditor:focus {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.4);
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1 1 auto;
+    background: #2c3e66;
+    color: white;
+}
+
+.btn-primary {
+    background: linear-gradient(95deg, #f09819, #ff5e62);
+    box-shadow: 0 5px 0 #aa2e2e;
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #aa2e2e;
+}
+
+.btn-secondary {
+    background: #3a4a6e;
+    box-shadow: 0 3px 0 #1e2a3a;
+}
+
+.examples-area {
+    background: #1e2436;
+    border-radius: 28px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+}
+
+.examples-area p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #ffb347;
+}
+
+.example-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.example-buttons button {
+    background: #2c3e50;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    box-shadow: none;
+    border-radius: 30px;
+    font-weight: normal;
+    transition: 0.1s linear;
+}
+
+.example-buttons button:active {
+    background: #ff884d;
+    color: black;
+}
+
+.result-area {
+    background: #0b0e16;
+    border-radius: 28px;
+    padding: 15px;
+    margin-top: 5px;
+}
+
+.result-area h3 {
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+    border-left: 4px solid #ffaa44;
+    padding-left: 12px;
+}
+
+#resultContainer {
+    background: #03050a;
+    border-radius: 20px;
+    padding: 12px;
+    overflow-x: auto;
+    font-size: 14px;
+}
+
+.result-card {
+    padding: 12px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+}
+
+.result-correct {
+    background: #1e4a2f;
+    border-left: 6px solid #6fef6f;
+}
+
+.result-error {
+    background: #5a1e1e;
+    border-left: 6px solid #ff8a7a;
+}
+
+.result-info {
+    background: #1e2a3a;
+    border-left: 6px solid #ffaa44;
+}
+
+.badge {
+    display: inline-block;
+    background: #ffaa44;
+    color: #1e1e2a;
+    border-radius: 30px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.placeholder {
+    text-align: center;
+    color: #aaa;
+    padding: 30px 10px;
+    font-style: italic;
+}
+
+footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+@media (max-width: 550px) {
+    body {
+        padding: 8px;
+    }
+    .app-container {
+        padding: 15px;
+    }
+    button {
+        padding: 10px 14px;
+    }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Validador SQL - Prepárate para el examen</title>
+    <link rel="stylesheet" href="estudioconsultas.css">
+    <script src="https://sql.js.org/dist/sql-wasm.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>📝 Validador SQL</h1>
+            <p>Comprueba tu consulta: sintaxis, JOINs, subconsultas... Sin ejecutar datos reales</p>
+        </header>
+
+        <div class="schema-badge" id="schemaStatus">
+            ⏳ Cargando base de datos de prueba...
+        </div>
+
+        <div class="query-area">
+            <label for="sqlEditor">✍️ Escribe tu consulta SQL:</label>
+            <textarea id="sqlEditor" rows="6" placeholder="Ejemplo: SELECT APELLIDO, DNOMBRE FROM EMPLE JOIN DEPART ON EMPLE.DEPT_NO = DEPART.DEPT_NO;"></textarea>
+            <div class="button-group">
+                <button id="validateBtn" class="btn-primary">🔍 Validar consulta</button>
+                <button id="clearBtn" class="btn-secondary">🗑 Limpiar</button>
+            </div>
+        </div>
+
+        <div class="examples-area">
+            <p>📋 Consultas de ejemplo para probar:</p>
+            <div class="example-buttons">
+                <button data-sql="SELECT * FROM EMPLE WHERE SALARIO > 200000;">Sintaxis correcta (simple)</button>
+                <button data-sql="SELECT APELLIDO, DNOMBRE FROM EMPLE JOIN DEPART ON EMPLE.DEPT_NO = DEPART.DEPT_NO;">Con JOIN</button>
+                <button data-sql="SELECT APELLIDO FROM EMPLE WHERE DEPT_NO = (SELECT DEPT_NO FROM DEPART WHERE DNOMBRE = 'VENTAS');">Subconsulta (anidada)</button>
+                <button data-sql="SELEC APELLIDO FROM EMPLE;">Error sintáctico</button>
+                <button data-sql="SELECT APELLIDO, SALARIO FROM EMPLE WHERE SALARIO > (SELECT AVG(SALARIO) FROM EMPLE);">Subconsulta escalar</button>
+            </div>
+        </div>
+
+        <div class="result-area">
+            <h3>📊 Análisis de la consulta</h3>
+            <div id="resultContainer">
+                <div class="placeholder">Aquí verás si la consulta es correcta, su tipo y si usa JOIN o subconsultas.</div>
+            </div>
+        </div>
+
+        <footer>
+            <small>Validador sintáctico y estructural - No se modifica ninguna base de datos real</small>
+        </footer>
+    </div>
+    <script src="estudioconsultas.js"></script>
+</body>
+</html>
