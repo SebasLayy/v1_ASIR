@@ -1,7 +1,44 @@
 let db = null;
 let SQL = null;
 
-// Inicializar BD en memoria (solo para validar sintaxis, no se usan datos)
+// Función para obtener todas las tablas y sus columnas desde la BD
+function cargarEsquema() {
+    if (!db) return;
+    try {
+        // Obtener lista de tablas del sqlite_master
+        const stmt = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+        const tables = [];
+        while (stmt.step()) {
+            tables.push(stmt.get()[0]);
+        }
+        stmt.free();
+        
+        let html = '';
+        for (let table of tables) {
+            // Obtener columnas de cada tabla
+            const pragma = db.prepare(`PRAGMA table_info(${table})`);
+            const columns = [];
+            while (pragma.step()) {
+                const col = pragma.get();
+                columns.push({ name: col[1], type: col[2] });
+            }
+            pragma.free();
+            
+            html += `<div class="schema-table">
+                        <strong>📌 ${table}</strong>
+                        <ul>`;
+            for (let col of columns) {
+                html += `<li>• ${col.name} (${col.type || 'TEXT'})</li>`;
+            }
+            html += `</ul></div>`;
+        }
+        document.getElementById('schemaContent').innerHTML = html || '<p>No se encontraron tablas.</p>';
+    } catch (err) {
+        console.error(err);
+        document.getElementById('schemaContent').innerHTML = '<p>Error al cargar esquema.</p>';
+    }
+}
+
 async function initDatabase() {
     const statusDiv = document.getElementById('schemaStatus');
     statusDiv.innerHTML = '🔄 Preparando entorno de validación...';
@@ -9,8 +46,7 @@ async function initDatabase() {
         SQL = await initSqlJs({ locateFile: file => `https://sql.js.org/dist/${file}` });
         db = new SQL.Database();
         
-        // Creamos las tablas necesarias (con estructura similar a tus ejercicios)
-        // para que el validador pueda comprobar la existencia de tablas/columnas
+        // Crear todas las tablas (exactamente las de los ejercicios)
         db.run(`CREATE TABLE DEPART (DEPT_NO NUMBER(2) primary key, DNOMBRE VARCHAR2(14), LOC VARCHAR2(14))`);
         db.run(`CREATE TABLE EMPLE (EMP_NO NUMBER(4) primary key, APELLIDO VARCHAR2(10), OFICIO VARCHAR2(10), DIR NUMBER(4), FECHA_ALT DATE, SALARIO NUMBER(10), COMISION NUMBER(10), DEPT_NO NUMBER(2))`);
         db.run(`CREATE TABLE NOTAS_ALUMNOS (NOMBRE_ALUMNO VARCHAR2(25), nota1 NUMBER(2), nota2 NUMBER(2), nota3 NUMBER(2))`);
@@ -19,21 +55,23 @@ async function initDatabase() {
         db.run(`CREATE TABLE ASIGNATURAS (COD NUMBER(2), NOMBRE VARCHAR2(25))`);
         db.run(`CREATE TABLE NOTAS (DNI VARCHAR2(10), COD NUMBER(2), NOTA NUMBER(2))`);
         
-        // Insertamos algunos registros ficticios para que el analizador de tipos funcione (opcional)
-        // No es necesario para validar sintaxis, pero ayuda a que no dé error "no such table"
-        statusDiv.innerHTML = '✅ Validador listo. Escribe tu consulta y pulsa "Validar".';
+        // Insertar algunos registros ficticios (opcional, solo para que el validador no dé error de tabla vacía)
+        // No es necesario para validar, pero lo dejamos para completar.
+        statusDiv.innerHTML = '✅ Validador listo. Puedes consultar el esquema (tablas y columnas) con el botón de abajo.';
         statusDiv.style.background = '#1e4a2f';
+        
+        // Cargar el esquema visual por primera vez
+        cargarEsquema();
     } catch (err) {
         statusDiv.innerHTML = '❌ Error al cargar validador: ' + err.message;
         statusDiv.style.background = '#5a1e1e';
     }
 }
 
-// Función para analizar si una consulta contiene JOIN o subconsultas (análisis textual)
 function analizarEstructura(sql) {
     const sqlUpper = sql.toUpperCase();
     const tieneJoin = /\b(INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN)\b/.test(sqlUpper);
-    const tieneSubconsulta = /\(\s*SELECT\b/i.test(sqlUpper); // Detecta paréntesis con SELECT dentro
+    const tieneSubconsulta = /\(\s*SELECT\b/i.test(sqlUpper);
     const tieneGroupBy = /\bGROUP\s+BY\b/.test(sqlUpper);
     const tieneOrderBy = /\bORDER\s+BY\b/.test(sqlUpper);
     const tieneFuncionAgregado = /\b(COUNT|SUM|AVG|MAX|MIN)\s*\(/i.test(sqlUpper);
@@ -41,20 +79,17 @@ function analizarEstructura(sql) {
     return { tieneJoin, tieneSubconsulta, tieneGroupBy, tieneOrderBy, tieneFuncionAgregado };
 }
 
-// Validar sintaxis usando SQL.js (capturando error)
 function validarSintaxis(sql) {
     if (!db) return { ok: false, error: "Base de datos no inicializada" };
     try {
-        // Preparamos la consulta (no la ejecutamos, solo compilamos)
         const stmt = db.prepare(sql);
-        stmt.free(); // Liberamos sin ejecutar
+        stmt.free();
         return { ok: true, error: null };
     } catch (err) {
         return { ok: false, error: err.message };
     }
 }
 
-// Mostrar resultado en el contenedor
 function mostrarAnalisis(sql) {
     const resultDiv = document.getElementById('resultContainer');
     if (!sql.trim()) {
@@ -62,29 +97,25 @@ function mostrarAnalisis(sql) {
         return;
     }
     
-    // Validar sintaxis
     const sintaxis = validarSintaxis(sql);
     const estructura = analizarEstructura(sql);
     
     let html = '';
     
-    // Tarjeta de sintaxis
     if (sintaxis.ok) {
         html += `<div class="result-card result-correct">
                     <strong>✅ Sintaxis correcta</strong><br>
-                    La consulta está bien formada y puede ejecutarse (sin errores de sintaxis).
+                    La consulta está bien formada.
                  </div>`;
     } else {
         html += `<div class="result-card result-error">
                     <strong>❌ Error de sintaxis</strong><br>
                     ${escapeHtml(sintaxis.error)}
                  </div>`;
-        // Si hay error, no mostramos el análisis estructural (puede ser engañoso)
         resultDiv.innerHTML = html;
         return;
     }
     
-    // Tarjeta de estructura
     let estructuraHtml = `<div class="result-card result-info">
                             <strong>📐 Estructura detectada:</strong><br>`;
     if (estructura.tieneJoin) estructuraHtml += `<span class="badge">🔗 JOIN</span>`;
@@ -99,7 +130,6 @@ function mostrarAnalisis(sql) {
     estructuraHtml += `</div>`;
     html += estructuraHtml;
     
-    // Añadir recomendación según el tipo de consulta esperada (opcional)
     if (estructura.tieneJoin && estructura.tieneSubconsulta) {
         html += `<div class="result-card result-info">
                     <strong>💡 Nota:</strong> Tu consulta combina JOIN y subconsultas. Asegúrate de que es lo que pide el ejercicio.
@@ -126,23 +156,33 @@ function escapeHtml(str) {
     });
 }
 
-// Eventos
 document.addEventListener('DOMContentLoaded', async () => {
     await initDatabase();
     
     const validateBtn = document.getElementById('validateBtn');
     const clearBtn = document.getElementById('clearBtn');
+    const toggleSchemaBtn = document.getElementById('toggleSchemaBtn');
+    const schemaContent = document.getElementById('schemaContent');
     const sqlEditor = document.getElementById('sqlEditor');
     const exampleBtns = document.querySelectorAll('.example-buttons button');
     
     validateBtn.addEventListener('click', () => {
-        const sql = sqlEditor.value;
-        mostrarAnalisis(sql);
+        mostrarAnalisis(sqlEditor.value);
     });
     
     clearBtn.addEventListener('click', () => {
         sqlEditor.value = '';
         document.getElementById('resultContainer').innerHTML = '<div class="placeholder">Listo para validar una nueva consulta.</div>';
+    });
+    
+    toggleSchemaBtn.addEventListener('click', () => {
+        if (schemaContent.style.display === 'none') {
+            schemaContent.style.display = 'block';
+            toggleSchemaBtn.textContent = '📄 Ocultar tablas y columnas';
+        } else {
+            schemaContent.style.display = 'none';
+            toggleSchemaBtn.textContent = '📂 Ver / Ocultar tablas y columnas';
+        }
     });
     
     exampleBtns.forEach(btn => {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Validador SQL - Prepárate para el examen</title>
+    <title>Validador SQL + Esquema de tablas</title>
     <link rel="stylesheet" href="estudioconsultas.css">
     <script src="https://sql.js.org/dist/sql-wasm.js"></script>
 </head>
@@ -11,11 +11,19 @@
     <div class="app-container">
         <header>
             <h1>📝 Validador SQL</h1>
-            <p>Comprueba tu consulta: sintaxis, JOINs, subconsultas... Sin ejecutar datos reales</p>
+            <p>Comprueba sintaxis y estructura (JOIN / subconsultas) | Tablas incluidas</p>
         </header>
 
         <div class="schema-badge" id="schemaStatus">
             ⏳ Cargando base de datos de prueba...
+        </div>
+
+        <!-- Panel de esquema (colapsable) -->
+        <div class="schema-panel">
+            <button id="toggleSchemaBtn" class="btn-schema">📂 Ver / Ocultar tablas y columnas</button>
+            <div id="schemaContent" style="display: none;" class="schema-content">
+                <!-- Aquí se cargará dinámicamente el listado de tablas -->
+            </div>
         </div>
 
         <div class="query-area">
